@@ -60,6 +60,19 @@ instance FromRecord TreasureLog where
         | length v == 3 = TreasureLog <$> v .! 0 <*> v .! 1 <*> v .! 2
         | otherwise = fail "Wrong number of fields"
 
+instance ToField PlayerName where
+    toField = BC.pack . getPlayerName
+
+instance ToField Location where
+    toField = BC.pack . show
+
+instance ToField UTCTime where
+    toField = BC.pack . show
+
+instance ToRecord TreasureLog where
+    toRecord (TreasureLog name' time' location') =
+        record [toField name', toField time', toField location']
+
 newtype PlayerName = PlayerName { getPlayerName :: String }
     deriving (Ord, Eq, Read, Show)
 
@@ -79,9 +92,10 @@ parseLocation :: T.Text -> Maybe Location
 parseLocation loc
     | T.null loc = Nothing
     | otherwise = firstMatch
-    where checkPrefix name l = if T.isPrefixOf (lowerCase name) (lowerCase . T.pack $ show l)
-            then Just l
-            else Nothing
+    where checkPrefix name l =
+            if T.isPrefixOf (lowerCase name) (lowerCase . T.pack $ show l)
+                then Just l
+                else Nothing
           lowerCase x = fromMaybe (T.strip . T.toLower $ x) $ stripLeading x
           stripLeading s = stripLeadingThe s >>= stripSpaces
           stripLeadingThe = T.stripPrefix "the" . T.toLower
