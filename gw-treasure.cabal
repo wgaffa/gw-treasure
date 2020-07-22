@@ -1,0 +1,68 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 5918a302bf9b18fc489227fdc8762ff6962eeee375f711ed7996aa5b67e3e53e
+
+name:           gw-treasure
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/wgaffa/gw-treasure#readme>
+homepage:       https://github.com/wgaffa/gw-treasure#readme
+bug-reports:    https://github.com/wgaffa/gw-treasure/issues
+author:         Wgaffa
+maintainer:     subscription@skriptladan.se
+copyright:      Wgaffa 2020
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/wgaffa/gw-treasure
+
+library
+  exposed-modules:
+      Treasure
+  other-modules:
+      Paths_gw_treasure
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , text
+    , time
+  default-language: Haskell2010
+
+executable gw-treasure-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_gw_treasure
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , gw-treasure
+    , text
+    , time
+  default-language: Haskell2010
+
+test-suite gw-treasure-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_gw_treasure
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , gw-treasure
+    , text
+    , time
+  default-language: Haskell2010
