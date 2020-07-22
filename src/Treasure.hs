@@ -3,9 +3,11 @@
 module Treasure (
     createPlayerName,
     parseLocation,
+    resetsAt,
     TreasureLog (..),
     Location (..),
-    )where
+    getPlayerName,
+    ) where
 
 import Data.Time
 import qualified Data.Text as T
@@ -66,11 +68,7 @@ parseLocation loc
           allLocations = [minBound .. maxBound]
           firstMatch = getFirst . mconcat . map First $ find
 
--- 2020-07-21T00:00:00
-convertString :: String -> Maybe UTCTime
-convertString = parseTimeM True defaultTimeLocale format
-    where format = iso8601DateFormat $ Just "%H:%M:%S"
-
-incDays :: Integer -> UTCTime -> UTCTime
-incDays incr time = UTCTime (addUtcDays time) $ utctDayTime time
-    where addUtcDays = addDays incr . utctDay
+resetsAt :: TreasureLog -> UTCTime
+resetsAt (TreasureLog _ time _) = 
+    let resetTime = addDays 30 $ utctDay time
+    in UTCTime resetTime $ utctDayTime time

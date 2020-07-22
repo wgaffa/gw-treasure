@@ -4,16 +4,16 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5918a302bf9b18fc489227fdc8762ff6962eeee375f711ed7996aa5b67e3e53e
+-- hash: ddf117b4344b0bf968b93a0ae6df7ab22dd557ba5485e814b1c50e19251a07e2
 
 name:           gw-treasure
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/wgaffa/gw-treasure#readme>
 homepage:       https://github.com/wgaffa/gw-treasure#readme
 bug-reports:    https://github.com/wgaffa/gw-treasure/issues
-author:         Wgaffa
+author:         Patrik Maunus
 maintainer:     subscription@skriptladan.se
-copyright:      Wgaffa 2020
+copyright:      Patrik Maunus 2020
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
