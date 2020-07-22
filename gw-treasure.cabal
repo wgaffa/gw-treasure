@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8cb7f512abb8fdbded4857201dbaa2a89a517f7c726a00b17543df6cea2b87f9
+-- hash: 37d6f82952c689ce4a296e6c00bfced7b17226fb543c9b70cec06a9fe5c4e43f
 
 name:           gw-treasure
 version:        0.1.0.0
@@ -34,9 +34,11 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , bytestring
     , cassava
     , text
     , time
+    , vector
   default-language: Haskell2010
 
 executable gw-treasure-exe
@@ -48,10 +50,12 @@ executable gw-treasure-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , bytestring
     , cassava
     , gw-treasure
     , text
     , time
+    , vector
   default-language: Haskell2010
 
 test-suite gw-treasure-test
@@ -64,8 +68,10 @@ test-suite gw-treasure-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , bytestring
     , cassava
     , gw-treasure
     , text
     , time
+    , vector
   default-language: Haskell2010

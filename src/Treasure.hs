@@ -11,8 +11,16 @@ module Treasure (
 
 import Data.Time
 import qualified Data.Text as T
+import Data.Text.Encoding
+import Data.ByteString (ByteString)
+import qualified Data.ByteString as B
+import qualified Data.ByteString.Char8 as BC
+import Control.Monad (mzero)
+import Control.Applicative (empty)
 import Data.Monoid
 import Data.Maybe
+import Data.Csv
+import Text.Read (readMaybe)
 
 data Location = IssnurIsles | MehtaniKeys | ArkjokWard | BahdokCaverns |
     JahaiBluffs | MirrorOfLyss | ForumHighlands | HiddenCityOfAhdashim |
@@ -37,6 +45,20 @@ instance Read Location where
     readsPrec _ loc = case parseLocation $ T.pack loc of
         Nothing -> []
         Just x -> [(x, "")]
+
+instance FromField Location where
+    parseField = maybe (fail "Invalid location") pure . parseLocation . decodeUtf8
+
+instance FromField PlayerName where
+    parseField = maybe (fail "Invalid player name") pure . createPlayerName . BC.unpack
+
+instance FromField UTCTime where
+    parseField = maybe (fail "Date time format invalid") pure . readMaybe . BC.unpack
+
+instance FromRecord TreasureLog where
+    parseRecord v
+        | length v == 3 = TreasureLog <$> v .! 0 <*> v .! 1 <*> v .! 2
+        | otherwise = fail "Wrong number of fields"
 
 newtype PlayerName = PlayerName { getPlayerName :: String }
     deriving (Ord, Eq, Read, Show)
@@ -69,6 +91,6 @@ parseLocation loc
           firstMatch = getFirst . mconcat . map First $ find
 
 resetsAt :: TreasureLog -> UTCTime
-resetsAt (TreasureLog _ time _) = 
+resetsAt (TreasureLog _ time _) =
     let resetTime = addDays 30 $ utctDay time
     in UTCTime resetTime $ utctDayTime time
