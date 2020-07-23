@@ -23,9 +23,9 @@ newtype PlayerName = PlayerName { unPlayerName :: String }
     deriving (Ord, Eq, Read, Show)
 
 data TreasureLog = TreasureLog {
-    playerName   :: PlayerName,
-    lastAccessed :: UTCTime,
-    location     :: Location
+    tlPlayerName   :: PlayerName,
+    tlLastAccessed :: UTCTime,
+    tlLocation     :: Location
 } deriving (Show, Read)
 
 instance Show Location where
