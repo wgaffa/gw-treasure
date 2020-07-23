@@ -5,9 +5,13 @@ module Treasure.Csv where
 import Data.Time
 
 import Data.Csv
+import Data.ByteString.Lazy (ByteString)
 import qualified Data.ByteString.Char8 as BC (pack, unpack)
 import Data.Text.Encoding (decodeUtf8)
+import Data.Text.Lazy.Encoding (encodeUtf8)
 import Text.Read (readMaybe)
+
+import Data.Vector (toList)
 
 import Treasure.Model
 
@@ -37,3 +41,6 @@ instance ToField UTCTime where
 instance ToRecord TreasureLog where
     toRecord (TreasureLog name' time' location') =
         record [toField name', toField time', toField location']
+
+readCsv :: ByteString -> Either String [TreasureLog]
+readCsv csv = decode NoHeader csv >>= Right . toList
