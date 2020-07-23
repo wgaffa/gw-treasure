@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 37d6f82952c689ce4a296e6c00bfced7b17226fb543c9b70cec06a9fe5c4e43f
+-- hash: 362f9bcfc5a59cdc61a822ff13bf6b997ae3f65992cbefdbb190f424f4675cea
 
 name:           gw-treasure
 version:        0.1.0.0
@@ -28,6 +28,8 @@ source-repository head
 library
   exposed-modules:
       Treasure
+      Treasure.Csv
+      Treasure.Model
   other-modules:
       Paths_gw_treasure
   hs-source-dirs:
