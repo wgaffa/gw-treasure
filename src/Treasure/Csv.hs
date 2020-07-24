@@ -3,6 +3,7 @@
 module Treasure.Csv where
 
 import Data.Time
+import Data.Time.Format
 
 import Data.Csv
 import Data.ByteString.Lazy (ByteString)
@@ -22,7 +23,7 @@ instance FromField PlayerName where
     parseField = maybe (fail "Invalid player name") pure . createPlayerName . BC.unpack
 
 instance FromField UTCTime where
-    parseField = maybe (fail "Date time format invalid") pure . readMaybe . BC.unpack
+    parseField = maybe (fail "Date time format invalid") pure . parseTimeM True defaultTimeLocale "%s" . BC.unpack
 
 instance FromRecord TreasureLog where
     parseRecord v
@@ -36,7 +37,7 @@ instance ToField Location where
     toField = BC.pack . show
 
 instance ToField UTCTime where
-    toField = BC.pack . show
+    toField = BC.pack . formatTime defaultTimeLocale "%s"
 
 instance ToRecord TreasureLog where
     toRecord (TreasureLog name' time' location') =
