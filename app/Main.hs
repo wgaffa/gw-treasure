@@ -8,6 +8,7 @@ import Data.List (unlines)
 import qualified Data.Text.Lazy as LT
 
 import Data.Time
+import Data.Time.LocalTime (utcToZonedTime)
 
 import Formatting
 import Formatting.Formatters
@@ -17,16 +18,15 @@ import Treasure.Csv
 
 main :: IO ()
 main = do
-    contents <- getContents
-    putStr (present contents)
+    timeZone <- getCurrentTimeZone
+    interact (present timeZone)
 
-present :: String -> String
-present = either id prettyPrint . readCsv . fromString
-
-prettyPrint :: Vector.Vector TreasureLog -> String
-prettyPrint = unlines . map presentLog . Vector.toList
-
-presentLog :: TreasureLog -> String
-presentLog (TreasureLog name time location) =
-    formatToString (right 25 ' ' % right 45 ' ' % shown)
-        (unPlayerName name) time location
+present :: TimeZone -> String -> String
+present timeZone = either id prettyPrint . readCsv . fromString
+    where 
+        prettyPrint = unlines . map presentLog . Vector.toList
+        presentLog (TreasureLog name time location) = 
+            formatToString (right 25 ' ' % right 25 ' ' % shown)
+            (unPlayerName name) (timeFormat $ localTime time) location
+        localTime = utcToLocalTime timeZone
+        timeFormat = formatTime defaultTimeLocale "%F %R"
