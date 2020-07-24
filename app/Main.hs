@@ -6,15 +6,20 @@ import Data.ByteString.Lazy.UTF8 (fromString)
 import qualified Data.Vector as Vector
 import Data.List (unlines)
 import qualified Data.Text.Lazy as LT
+import qualified Data.Text.Lazy.Builder as LTB
 
 import Data.Time
 import Data.Time.LocalTime (utcToZonedTime)
 
 import Formatting
+import Formatting.Buildable
 import Formatting.Formatters
 
 import Treasure
 import Treasure.Csv
+
+instance Buildable PlayerName where
+    build = LTB.fromString . unPlayerName 
 
 main :: IO ()
 main = do
@@ -27,6 +32,6 @@ present timeZone = either id prettyPrint . readCsv . fromString
         prettyPrint = unlines . map presentLog . Vector.toList
         presentLog (TreasureLog name time location) = 
             formatToString (right 25 ' ' % right 25 ' ' % shown)
-            (unPlayerName name) (timeFormat $ localTime time) location
+            name (timeFormat $ localTime time) location
         localTime = utcToLocalTime timeZone
         timeFormat = formatTime defaultTimeLocale "%F %R"
