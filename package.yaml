@@ -40,6 +40,8 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - gw-treasure
+    - formatting
+    - utf8-string
 
 tests:
   gw-treasure-test:
