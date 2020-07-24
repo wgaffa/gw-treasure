@@ -11,7 +11,7 @@ import Data.Text.Encoding (decodeUtf8)
 import Data.Text.Lazy.Encoding (encodeUtf8)
 import Text.Read (readMaybe)
 
-import Data.Vector (toList)
+import Data.Vector (Vector(), toList)
 
 import Treasure.Model
 
@@ -42,5 +42,5 @@ instance ToRecord TreasureLog where
     toRecord (TreasureLog name' time' location') =
         record [toField name', toField time', toField location']
 
-readCsv :: ByteString -> Either String [TreasureLog]
-readCsv csv = decode NoHeader csv >>= Right . toList
+readCsv :: ByteString -> Either String (Vector TreasureLog)
+readCsv = decode NoHeader
