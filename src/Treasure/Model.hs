@@ -19,7 +19,7 @@ data Location = IssnurIsles | MehtaniKeys | ArkjokWard | BahdokCaverns |
     RupturedHeart | SulfurousWastes | DomainOfPain | NightfallenJahai
     deriving (Eq, Enum, Bounded)
 
-newtype PlayerName = PlayerName { unPlayerName :: String }
+newtype PlayerName = PlayerName { unPlayerName :: T.Text }
     deriving (Ord, Eq, Read, Show)
 
 data TreasureLog = TreasureLog {
@@ -47,11 +47,11 @@ instance Read Location where
         Nothing -> []
         Just x -> [(x, "")]
 
-createPlayerName :: String -> Maybe PlayerName
+createPlayerName :: T.Text -> Maybe PlayerName
 createPlayerName name
-    | length name >= 3 && wordCount > 1 = Just $ PlayerName name
+    | T.length name >= 3 && wordCount > 1 = Just $ PlayerName name
     | otherwise = Nothing
-    where wordCount = length . words $ name
+    where wordCount = length . T.words $ name
 
 parseLocation :: T.Text -> Maybe Location
 parseLocation loc

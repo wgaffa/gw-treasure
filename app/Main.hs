@@ -9,7 +9,6 @@ import qualified Data.Text.Lazy as LT
 import qualified Data.Text.Lazy.Builder as LTB
 
 import Data.Time
-import Data.Time.LocalTime (utcToZonedTime)
 
 import Formatting
 import Formatting.Buildable
@@ -19,7 +18,7 @@ import Treasure
 import Treasure.Csv
 
 instance Buildable PlayerName where
-    build = LTB.fromString . unPlayerName 
+    build = LTB.fromText . unPlayerName 
 
 main :: IO ()
 main = do
