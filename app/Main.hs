@@ -53,7 +53,7 @@ separator :: IO ()
 separator = do
     windowSize <- size
     let terminalWidth = maybe 0 width windowSize
-    putStrLn $ replicate terminalWidth '\x2014'
+    putStrLn $ replicate terminalWidth '\x2500'
 
 header :: String -> IO ()
 header str = do
