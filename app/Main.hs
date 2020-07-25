@@ -17,7 +17,6 @@ import Data.Time
 
 import Formatting
 import Formatting.Buildable
-import Formatting.Formatters
 
 import Treasure
 import Treasure.Csv
@@ -31,16 +30,24 @@ main = do
     contents <- getContents
     let logs = readCsv $ fromString contents
         resets = resetTimes <$> logs
-        missing = missingLocations <$> logs
+        missingLocs = missingLocations <$> logs
 
-    putStr $ either id (present timeZone) resets
-    putStrLn "---"
-    putStr $ either id presentMissing missing
+    putStrLn "Next Reset for characters"
+    let resetStr = either (: []) (map (present timeZone) . Vector.toList) resets
+    mapM_ putStrLn resetStr
+
+    putStrLn separator
+    putStrLn "Spots not visited for each character"
+    let missingStr = either (: []) (map presentMissing . M.toList) missingLocs
+    mapM_ putStrLn missingStr
+
+separator :: String
+separator = replicate 75 '-'
 
 resetTimes :: Vector.Vector TreasureLog -> Vector.Vector TreasureLog
 resetTimes = Vector.map reset
     where
-        reset (TreasureLog name time loc) = TreasureLog name (resetsAt time) loc
+        reset log@(TreasureLog _ time _) = log {tlLastAccessed = resetsAt time}
 
 missingLocations :: Vector.Vector TreasureLog -> M.Map PlayerName [Location]
 missingLocations = M.map unVisited . createMap
@@ -50,19 +57,19 @@ missingLocations = M.map unVisited . createMap
         allLocations = [minBound .. maxBound] :: [Location]
         unVisited locs = allLocations \\ locs
 
-presentMissing :: M.Map PlayerName [Location] -> String
-presentMissing = unlines . map missingString . M.toList
-    where
-        missingString (name, locs) = playerName name ++ ": " ++ intercalate ", " (locationTranslate locs)
-        locationTranslate = map show
-        playerName = T.unpack . unPlayerName
+presentMissing :: (PlayerName, [Location]) -> String
+presentMissing (name, locs) = 
+    formatToString playerLocationFormat name (intercalate ", " (map show locs))
 
-present :: TimeZone -> Vector.Vector TreasureLog -> String
-present timeZone = vectorUnlines . Vector.map presentLog
+present :: TimeZone -> TreasureLog -> String
+present timeZone (TreasureLog name time location) = 
+    formatToString treasureLogFormat name timeFormat location
     where
-        vectorUnlines = Vector.foldr (\ x acc -> x ++ "\r\n" ++ acc) ""
-        presentLog (TreasureLog name time location) =
-            formatToString (right 25 ' ' % right 25 ' ' % shown)
-            name (timeFormat $ localTime time) location
         localTime = utcToLocalTime timeZone
-        timeFormat = formatTime defaultTimeLocale "%F %R"
+        timeFormat = formatTime defaultTimeLocale "%F %R" $ localTime time
+
+treasureLogFormat :: Format r (PlayerName -> String -> Location -> r)
+treasureLogFormat = right 25 ' ' % right 25 ' ' % shown
+
+playerLocationFormat :: Format r (PlayerName -> String -> r)
+playerLocationFormat = right 25 ' ' % string
