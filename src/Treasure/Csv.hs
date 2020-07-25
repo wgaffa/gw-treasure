@@ -3,7 +3,6 @@
 module Treasure.Csv where
 
 import Data.Time
-import Data.Time.Format
 
 import Data.Csv
 import Data.ByteString.Lazy (ByteString)
