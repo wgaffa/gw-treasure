@@ -23,12 +23,21 @@ instance Buildable PlayerName where
 main :: IO ()
 main = do
     timeZone <- getCurrentTimeZone
-    interact (present timeZone)
+    contents <- getContents
+    let logs = readCsv $ fromString contents
+        resets = resetTimes <$> logs
+    
+    putStr $ either id (present timeZone) resets
 
-present :: TimeZone -> String -> String
-present timeZone = either id prettyPrint . readCsv . fromString
+resetTimes :: Vector.Vector TreasureLog -> Vector.Vector TreasureLog
+resetTimes = Vector.map reset
+    where
+        reset (TreasureLog name time loc) = TreasureLog name (resetsAt time) loc
+
+present :: TimeZone -> Vector.Vector TreasureLog -> String
+present timeZone = vectorUnlines . Vector.map presentLog
     where 
-        prettyPrint = unlines . map presentLog . Vector.toList
+        vectorUnlines = Vector.foldr (\ x acc -> x ++ "\r\n" ++ acc) ""
         presentLog (TreasureLog name time location) = 
             formatToString (right 25 ' ' % right 25 ' ' % shown)
             name (timeFormat $ localTime time) location
