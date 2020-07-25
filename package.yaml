@@ -42,6 +42,7 @@ executables:
     - gw-treasure
     - formatting
     - utf8-string
+    - containers
 
 tests:
   gw-treasure-test:
