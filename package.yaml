@@ -43,6 +43,8 @@ executables:
     - formatting
     - utf8-string
     - containers
+    - ansi-terminal
+    - terminal-size
 
 tests:
   gw-treasure-test:

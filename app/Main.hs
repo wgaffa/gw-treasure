@@ -2,6 +2,11 @@
 
 module Main where
 
+import System.Console.ANSI
+import System.Console.Terminal.Size
+import System.Environment
+import GHC.IO.Encoding
+
 import Data.Maybe
 
 import Data.ByteString.Lazy.UTF8 (fromString)
@@ -26,23 +31,35 @@ instance Buildable PlayerName where
 
 main :: IO ()
 main = do
+    setLocaleEncoding utf8
     timeZone <- getCurrentTimeZone
-    contents <- getContents
+    (file:args) <- getArgs
+    contents <- readFile file
     let logs = readCsv $ fromString contents
         resets = resetTimes <$> logs
         missingLocs = missingLocations <$> logs
 
-    putStrLn "Next Reset for characters"
+    header "Next Reset for characters"
     let resetStr = either (: []) (map (present timeZone) . Vector.toList) resets
     mapM_ putStrLn resetStr
 
-    putStrLn separator
-    putStrLn "Spots not visited for each character"
+    separator
+    header "Spots not visited for each character"
     let missingStr = either (: []) (map presentMissing . M.toList) missingLocs
     mapM_ putStrLn missingStr
+    setSGR [Reset]
 
-separator :: String
-separator = replicate 75 '-'
+separator :: IO ()
+separator = do
+    windowSize <- size
+    let terminalWidth = maybe 0 width windowSize
+    putStrLn $ replicate terminalWidth '\x2014'
+
+header :: String -> IO ()
+header str = do
+    setSGR [SetColor Foreground Dull Green]
+    putStrLn str
+    setSGR []
 
 resetTimes :: Vector.Vector TreasureLog -> Vector.Vector TreasureLog
 resetTimes = Vector.map reset
