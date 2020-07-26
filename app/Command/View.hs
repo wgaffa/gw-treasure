@@ -32,7 +32,7 @@ viewReset contents = do
         missingLocs = missingLocations <$> logs
 
     header "Next Reset for characters"
-    let resetStr = either (: []) (map (present timeZone) . Vector.toList) resets
+    let resetStr = either (: []) (map (presentLog timeZone) . Vector.toList) resets
     mapM_ putStrLn resetStr
 
     separator

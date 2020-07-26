@@ -16,8 +16,8 @@ presentMissing :: (PlayerName, [Location]) -> String
 presentMissing (name, locs) =
     formatToString playerLocationFormat name (intercalate ", " (map show locs))
 
-present :: TimeZone -> TreasureLog -> String
-present timeZone (TreasureLog name time location) =
+presentLog :: TimeZone -> TreasureLog -> String
+presentLog timeZone (TreasureLog name time location) =
     formatToString treasureLogFormat name timeFormat location
     where
         localTime = utcToLocalTime timeZone
