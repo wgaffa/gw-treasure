@@ -26,7 +26,11 @@ data TreasureLog = TreasureLog {
     tlPlayerName   :: PlayerName,
     tlLastAccessed :: UTCTime,
     tlLocation     :: Location
-} deriving (Show, Read)
+} deriving (Show)
+
+instance Eq TreasureLog where
+    (==) a b = tlPlayerName a == tlPlayerName b
+        && tlLocation a == tlLocation b
 
 instance Show Location where
     show IssnurIsles = "Issnur Isles"

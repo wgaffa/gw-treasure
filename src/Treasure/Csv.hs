@@ -10,7 +10,8 @@ import qualified Data.ByteString.Char8 as BC (pack, unpack)
 import Data.Text.Encoding (decodeUtf8, encodeUtf8)
 import Text.Read (readMaybe)
 
-import Data.Vector (Vector(), toList)
+import qualified Data.Vector as Vector
+import Data.List
 
 import Treasure.Model
 
@@ -41,5 +42,8 @@ instance ToRecord TreasureLog where
     toRecord (TreasureLog name' time' location') =
         record [toField name', toField time', toField location']
 
-readCsv :: ByteString -> Either String (Vector TreasureLog)
-readCsv = decode NoHeader
+readCsv :: ByteString -> Either String (Vector.Vector TreasureLog)
+readCsv csv = do
+    table <- decode NoHeader csv :: Either String (Vector.Vector TreasureLog)
+    let removeDup = Vector.fromList . nub . Vector.toList
+        in return $ removeDup table
