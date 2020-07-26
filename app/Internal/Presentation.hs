@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Internal.Presentation where
 
 import qualified Data.Text.Lazy.Builder as LTB
@@ -17,14 +18,14 @@ presentMissing (name, locs) =
     formatToString playerLocationFormat name (intercalate ", " (map show locs))
 
 presentLog :: TimeZone -> TreasureLog -> String
-presentLog timeZone (TreasureLog name time location) =
-    formatToString treasureLogFormat name timeFormat location
+presentLog timeZone (TreasureLog _ time location) =
+    formatToString treasureLogFormat timeFormat location
     where
         localTime = utcToLocalTime timeZone
         timeFormat = formatTime defaultTimeLocale "%F %R" $ localTime time
 
-treasureLogFormat :: Format r (PlayerName -> String -> Location -> r)
-treasureLogFormat = right 25 ' ' % right 25 ' ' % shown
+treasureLogFormat :: Format r (String -> Location -> r)
+treasureLogFormat = "  " % right 25 ' ' % shown
 
 playerLocationFormat :: Format r (PlayerName -> String -> r)
 playerLocationFormat = right 25 ' ' % string

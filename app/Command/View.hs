@@ -6,6 +6,7 @@ import System.Console.Terminal.Size
 import Data.Time
 
 import Data.ByteString.Lazy.UTF8 (fromString)
+import qualified Data.Text as T
 
 import qualified Data.Vector as Vector
 import qualified Data.Map as Map
@@ -14,6 +15,7 @@ import Helper.Terminal
 import Internal.Transformations
 import Internal.Presentation
 
+import Treasure
 import Treasure.Csv
 
 view :: [String] -> IO ()
@@ -31,9 +33,9 @@ viewReset contents = do
 
     header "Next Reset for characters"
     let resets = resetTimes <$> logs
-        resetStr = either (: []) (map (presentLog timeZone) . mapping) resets
-        mapping = concat . Map.elems . toPlayerMap
-        in mapM_ putStrLn resetStr
+        map = toPlayerMap <$> resets
+        toPair = either (\ x -> [(x, [])]) Map.toList map
+        in mapM_ playerReset toPair
 
     separator
     header "Spots not visited for each character"
@@ -41,3 +43,9 @@ viewReset contents = do
         missingStr = either (: []) (map presentMissing . Map.toList) missingLocs
         in mapM_ putStrLn missingStr
     setSGR [Reset]
+
+playerReset :: (String, [TreasureLog]) -> IO ()
+playerReset (name, logs) = do
+    putStrLn name
+    timeZone <- getCurrentTimeZone
+    mapM_ (putStrLn . presentLog timeZone) logs
