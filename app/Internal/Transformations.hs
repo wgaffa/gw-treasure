@@ -18,3 +18,7 @@ missingLocations = Map.map unVisited . createMap
         mapByName = Vector.map (\ tl@(TreasureLog n _ l) -> (n, [l]))
         allLocations = [minBound .. maxBound] :: [Location]
         unVisited locs = allLocations \\ locs
+
+toPlayerMap :: Vector.Vector TreasureLog -> Map.Map PlayerName [TreasureLog]
+toPlayerMap = Map.fromListWith (++) . 
+    Vector.toList . Vector.map (\ tl@(TreasureLog n _ _) -> (n, [tl]))

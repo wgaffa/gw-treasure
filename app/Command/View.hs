@@ -28,15 +28,16 @@ viewReset :: String -> IO ()
 viewReset contents = do
     timeZone <- getCurrentTimeZone
     let logs = readCsv $ fromString contents
-        resets = resetTimes <$> logs
-        missingLocs = missingLocations <$> logs
 
     header "Next Reset for characters"
-    let resetStr = either (: []) (map (presentLog timeZone) . Vector.toList) resets
-    mapM_ putStrLn resetStr
+    let resets = resetTimes <$> logs
+        resetStr = either (: []) (map (presentLog timeZone) . mapping) resets
+        mapping = concat . Map.elems . toPlayerMap
+        in mapM_ putStrLn resetStr
 
     separator
     header "Spots not visited for each character"
-    let missingStr = either (: []) (map presentMissing . Map.toList) missingLocs
-    mapM_ putStrLn missingStr
+    let missingLocs = missingLocations <$> logs
+        missingStr = either (: []) (map presentMissing . Map.toList) missingLocs
+        in mapM_ putStrLn missingStr
     setSGR [Reset]
