@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 870542e20c209f209f87d579bca7dd25f000e29afc39bfae95b712f46cdefd37
+-- hash: 5cf7122f81df33b2858e9c9106f8034d4e1f06be3cc70fbaaacca0ceb47aee3d
 
 name:           gw-treasure
 version:        0.1.0.0
@@ -46,6 +46,12 @@ library
 executable gw-treasure-exe
   main-is: Main.hs
   other-modules:
+      Command
+      Command.Args
+      Command.View
+      Helper.Terminal
+      Internal.Presentation
+      Internal.Transformations
       Paths_gw_treasure
   hs-source-dirs:
       app
