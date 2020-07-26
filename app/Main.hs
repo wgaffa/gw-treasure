@@ -29,12 +29,25 @@ import Treasure.Csv
 instance Buildable PlayerName where
     build = LTB.fromText . unPlayerName
 
-main :: IO ()
-main = do
-    setLocaleEncoding utf8
+dispatch :: [(String, [String] -> IO ())]
+dispatch = [
+    ("view", view)
+    ]
+
+usage :: [String] -> IO ()
+usage _ = putStrLn "usage: command [filename]"
+
+view :: [String] -> IO ()
+view [] = do
+    contents <- getContents
+    viewReset contents
+view [filename] = do
+    contents <- readFile filename
+    viewReset contents
+
+viewReset :: String -> IO ()
+viewReset contents = do
     timeZone <- getCurrentTimeZone
-    (file:args) <- getArgs
-    contents <- readFile file
     let logs = readCsv $ fromString contents
         resets = resetTimes <$> logs
         missingLocs = missingLocations <$> logs
@@ -48,6 +61,17 @@ main = do
     let missingStr = either (: []) (map presentMissing . M.toList) missingLocs
     mapM_ putStrLn missingStr
     setSGR [Reset]
+
+main :: IO ()
+main = do
+    setLocaleEncoding utf8
+    commandline <- getArgs
+    let (action, args) = fromMaybe (usage, [""]) $ arguments commandline
+    action args
+
+arguments :: [String] -> Maybe ([String] -> IO (), [String])
+arguments [] = Nothing
+arguments (command:args) = lookup command dispatch >>= \x -> pure (x, args)
 
 separator :: IO ()
 separator = do
@@ -75,11 +99,11 @@ missingLocations = M.map unVisited . createMap
         unVisited locs = allLocations \\ locs
 
 presentMissing :: (PlayerName, [Location]) -> String
-presentMissing (name, locs) = 
+presentMissing (name, locs) =
     formatToString playerLocationFormat name (intercalate ", " (map show locs))
 
 present :: TimeZone -> TreasureLog -> String
-present timeZone (TreasureLog name time location) = 
+present timeZone (TreasureLog name time location) =
     formatToString treasureLogFormat name timeFormat location
     where
         localTime = utcToLocalTime timeZone
