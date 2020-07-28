@@ -17,12 +17,12 @@ presentMissing :: (PlayerName, [Location]) -> String
 presentMissing (name, locs) =
     formatToString playerLocationFormat name (intercalate ", " (map show locs))
 
-presentLog :: TimeZone -> TreasureLog -> String
-presentLog timeZone (TreasureLog _ time location) =
-    formatToString treasureLogFormat timeFormat location
+presentLocation :: TimeZone -> LocationLog -> String
+presentLocation timeZone (LocationLog (location, time)) =
+    formatToString treasureLogFormat timeString location
     where
-        localTime = utcToLocalTime timeZone
-        timeFormat = formatTime defaultTimeLocale "%F %R" $ localTime time
+        timeFormat = formatTime defaultTimeLocale "%F %R" . utcToLocalTime timeZone
+        timeString = maybe "Not recorded" timeFormat time
 
 treasureLogFormat :: Format r (String -> Location -> r)
 treasureLogFormat = "  " % right 25 ' ' % shown

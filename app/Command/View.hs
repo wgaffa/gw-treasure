@@ -33,9 +33,8 @@ viewReset contents = do
 
     header "Next Reset for characters"
     let resets = resetTimes <$> logs
-        map = toPlayerMap <$> resets
-        toPair = either (\ x -> [(x, [])]) Map.toList map
-        in mapM_ playerReset toPair
+        players = toPlayerMap <$> resets
+        in mapM_ playerReset $ either (const []) Map.toList players
 
     separator
     header "Spots not visited for each character"
@@ -44,8 +43,8 @@ viewReset contents = do
         in mapM_ putStrLn missingStr
     setSGR [Reset]
 
-playerReset :: (String, [TreasureLog]) -> IO ()
+playerReset :: PlayerLog -> IO ()
 playerReset (name, logs) = do
-    putStrLn name
+    putStrLn . T.unpack . unPlayerName $ name
     timeZone <- getCurrentTimeZone
-    mapM_ (putStrLn . presentLog timeZone) logs
+    mapM_ (putStrLn . presentLocation timeZone) logs

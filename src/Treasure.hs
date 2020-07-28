@@ -3,8 +3,11 @@
 module Treasure (
     TreasureLog (..)
     , Location (..)
+    , LocationLog(..)
     , PlayerName()
+    , PlayerLog
     , createPlayerName
+    , createPlayerLog
     , unPlayerName
     , parseLocation
     , resetsAt

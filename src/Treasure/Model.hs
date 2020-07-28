@@ -4,8 +4,11 @@ module Treasure.Model (
       Location(..)
     , TreasureLog(..)
     , PlayerName()
+    , LocationLog(..)
+    , PlayerLog
     , unPlayerName
     , createPlayerName
+    , createPlayerLog
     , parseLocation
     ) where
 
@@ -13,6 +16,8 @@ import Data.Time
 import qualified Data.Text as T
 import Data.Maybe (fromMaybe)
 import Data.Monoid (First(..), getFirst)
+
+import Data.Vector (Vector, singleton)
 
 data Location = IssnurIsles | MehtaniKeys | ArkjokWard | BahdokCaverns |
     JahaiBluffs | MirrorOfLyss | ForumHighlands | HiddenCityOfAhdashim |
@@ -22,15 +27,28 @@ data Location = IssnurIsles | MehtaniKeys | ArkjokWard | BahdokCaverns |
 newtype PlayerName = PlayerName { unPlayerName :: T.Text }
     deriving (Ord, Eq, Read, Show)
 
+-- | Data structure of a flat log file such as CSV files
 data TreasureLog = TreasureLog {
     tlPlayerName   :: PlayerName,
     tlLastAccessed :: UTCTime,
     tlLocation     :: Location
 } deriving (Show)
 
+-- | Denotes when a treasure was last accessed,
+-- Nothing denotes that there is no record of it being opened.
+-- A location log is equal to another if their location is equal.
+newtype LocationLog = LocationLog { unLocationLog :: (Location, Maybe UTCTime) }
+    deriving (Show)
+
+-- | Structure for representing a players log
+type PlayerLog = (PlayerName, Vector LocationLog)
+
 instance Eq TreasureLog where
     (==) a b = tlPlayerName a == tlPlayerName b
         && tlLocation a == tlLocation b
+
+instance Eq LocationLog where
+    (==) a b = fst (unLocationLog a) == fst (unLocationLog b)
 
 instance Show Location where
     show IssnurIsles = "Issnur Isles"
@@ -56,6 +74,9 @@ createPlayerName name
     | T.length name >= 3 && wordCount > 1 = Just $ PlayerName name
     | otherwise = Nothing
     where wordCount = length . T.words $ name
+
+createPlayerLog :: TreasureLog -> PlayerLog
+createPlayerLog (TreasureLog name time loc) = (name, singleton $ LocationLog (loc, Just time)) 
 
 parseLocation :: T.Text -> Maybe Location
 parseLocation loc

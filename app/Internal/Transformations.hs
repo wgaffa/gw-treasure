@@ -21,7 +21,5 @@ missingLocations = Map.map unVisited . createMap
         allLocations = [minBound .. maxBound] :: [Location]
         unVisited locs = allLocations \\ locs
 
-toPlayerMap :: Vector.Vector TreasureLog -> Map.Map String [TreasureLog]
-toPlayerMap = Map.fromListWith (++) . 
-    Vector.toList . Vector.map 
-        (\ tl@(TreasureLog n _ _) -> (T.unpack . unPlayerName $ n, [tl]))
+toPlayerMap :: Vector.Vector TreasureLog -> Map.Map PlayerName (Vector.Vector LocationLog)
+toPlayerMap = Map.fromListWith (Vector.++) . Vector.toList . Vector.map createPlayerLog
