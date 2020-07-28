@@ -13,11 +13,3 @@ resetTimes = Map.map reset
     where
         reset = Vector.map resetLocation
         resetLocation (LocationLog (loc, time)) = LocationLog (loc, resetsAt <$> time)
-
-missingLocations :: Vector.Vector TreasureLog -> Map.Map PlayerName [Location]
-missingLocations = Map.map unVisited . createMap
-    where
-        createMap = Map.fromListWith (++) . Vector.toList . mapByName
-        mapByName = Vector.map (\ tl@(TreasureLog n _ l) -> (n, [l]))
-        allLocations = [minBound .. maxBound] :: [Location]
-        unVisited locs = allLocations \\ locs

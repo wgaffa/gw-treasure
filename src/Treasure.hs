@@ -1,13 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Treasure (
-    TreasureLog (..)
-    , Location (..)
+    Location (..)
     , LocationLog(..)
     , PlayerName()
     , PlayerLog
     , createPlayerName
-    , createPlayerLog
     , unPlayerName
     , parseLocation
     , resetsAt

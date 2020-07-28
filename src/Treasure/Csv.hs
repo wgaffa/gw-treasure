@@ -1,6 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Treasure.Csv where
+module Treasure.Csv(
+    readCsv
+) where
 
 import Data.Time
 
@@ -15,6 +17,17 @@ import qualified Data.Map as Map
 import Data.List
 
 import Treasure.Model
+
+-- | Data structure of a flat log file such as CSV files
+data TreasureLog = TreasureLog {
+    tlPlayerName   :: PlayerName,
+    tlLastAccessed :: UTCTime,
+    tlLocation     :: Location
+} deriving (Show)
+
+instance Eq TreasureLog where
+    (==) a b = tlPlayerName a == tlPlayerName b
+        && tlLocation a == tlLocation b
 
 instance FromField Location where
     parseField = maybe (fail "Invalid location") pure . parseLocation . decodeUtf8
@@ -50,3 +63,6 @@ readCsv csv = do
     let removeDup = Vector.fromList . nub . Vector.toList
         playerLogMap = Map.fromListWith (Vector.++) . Vector.toList . Vector.map createPlayerLog
         in return . playerLogMap . removeDup $ table
+
+createPlayerLog :: TreasureLog -> PlayerLog
+createPlayerLog (TreasureLog name time loc) = (name, Vector.singleton $ LocationLog (loc, Just time)) 
