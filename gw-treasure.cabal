@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5cf7122f81df33b2858e9c9106f8034d4e1f06be3cc70fbaaacca0ceb47aee3d
+-- hash: 4906d4e6e533f0cf8bb1df137406764e12b0d9d99e0b9432a9979d6ad49d2f6c
 
 name:           gw-treasure
 version:        0.1.0.0
@@ -38,6 +38,7 @@ library
       base >=4.7 && <5
     , bytestring
     , cassava
+    , containers
     , text
     , time
     , vector
@@ -83,6 +84,7 @@ test-suite gw-treasure-test
       base >=4.7 && <5
     , bytestring
     , cassava
+    , containers
     , gw-treasure
     , text
     , time

@@ -8,10 +8,11 @@ import qualified Data.Text as T
 
 import Treasure
 
-resetTimes :: Vector.Vector TreasureLog -> Vector.Vector TreasureLog
-resetTimes = Vector.map reset
+resetTimes :: Map.Map PlayerName (Vector.Vector LocationLog) -> Map.Map PlayerName (Vector.Vector LocationLog)
+resetTimes = Map.map reset
     where
-        reset log@(TreasureLog _ time _) = log {tlLastAccessed = resetsAt time}
+        reset = Vector.map resetLocation
+        resetLocation (LocationLog (loc, time)) = LocationLog (loc, resetsAt <$> time)
 
 missingLocations :: Vector.Vector TreasureLog -> Map.Map PlayerName [Location]
 missingLocations = Map.map unVisited . createMap
@@ -20,6 +21,3 @@ missingLocations = Map.map unVisited . createMap
         mapByName = Vector.map (\ tl@(TreasureLog n _ l) -> (n, [l]))
         allLocations = [minBound .. maxBound] :: [Location]
         unVisited locs = allLocations \\ locs
-
-toPlayerMap :: Vector.Vector TreasureLog -> Map.Map PlayerName (Vector.Vector LocationLog)
-toPlayerMap = Map.fromListWith (Vector.++) . Vector.toList . Vector.map createPlayerLog

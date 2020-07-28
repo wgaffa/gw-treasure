@@ -26,6 +26,7 @@ dependencies:
 - bytestring
 - vector
 - cassava
+- containers
 
 library:
   source-dirs: src

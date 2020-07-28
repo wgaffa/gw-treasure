@@ -33,14 +33,8 @@ viewReset contents = do
 
     header "Next Reset for characters"
     let resets = resetTimes <$> logs
-        players = toPlayerMap <$> resets
-        in mapM_ playerReset $ either (const []) Map.toList players
+        in mapM_ playerReset $ either (const []) Map.toList resets
 
-    separator
-    header "Spots not visited for each character"
-    let missingLocs = missingLocations <$> logs
-        missingStr = either (: []) (map presentMissing . Map.toList) missingLocs
-        in mapM_ putStrLn missingStr
     setSGR [Reset]
 
 playerReset :: PlayerLog -> IO ()

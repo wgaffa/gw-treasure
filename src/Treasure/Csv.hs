@@ -11,6 +11,7 @@ import Data.Text.Encoding (decodeUtf8, encodeUtf8)
 import Text.Read (readMaybe)
 
 import qualified Data.Vector as Vector
+import qualified Data.Map as Map
 import Data.List
 
 import Treasure.Model
@@ -42,8 +43,10 @@ instance ToRecord TreasureLog where
     toRecord (TreasureLog name' time' location') =
         record [toField name', toField time', toField location']
 
-readCsv :: ByteString -> Either String (Vector.Vector TreasureLog)
+-- | Read a CSV string and remove any duplicate entries
+readCsv :: ByteString -> Either String (Map.Map PlayerName (Vector.Vector LocationLog))
 readCsv csv = do
     table <- decode NoHeader csv :: Either String (Vector.Vector TreasureLog)
     let removeDup = Vector.fromList . nub . Vector.toList
-        in return $ removeDup table
+        playerLogMap = Map.fromListWith (Vector.++) . Vector.toList . Vector.map createPlayerLog
+        in return . playerLogMap . removeDup $ table
