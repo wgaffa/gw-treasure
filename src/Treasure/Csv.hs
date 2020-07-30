@@ -2,6 +2,7 @@
 
 module Treasure.Csv(
     readCsv
+    , saveCsv
 ) where
 
 import Data.Time
@@ -10,15 +11,18 @@ import Data.Csv
 import Data.ByteString.Lazy (ByteString)
 import qualified Data.ByteString.Char8 as BC (pack, unpack)
 import Data.Text.Encoding (decodeUtf8, encodeUtf8)
+import qualified Data.Text as Text
 import Text.Read (readMaybe)
 
 import qualified Data.Vector as Vector
 import qualified Data.Map as Map
 import Data.List
+import Data.Maybe (fromJust)
 
 import Treasure.Model
 
 -- | Data structure of a flat log file such as CSV files
+
 data TreasureLog = TreasureLog {
     tlPlayerName   :: PlayerName,
     tlLastAccessed :: UTCTime,
@@ -57,6 +61,7 @@ instance ToRecord TreasureLog where
         record [toField name', toField time', toField location']
 
 -- | Read a CSV string and remove any duplicate entries
+
 readCsv :: ByteString -> Either String (Map.Map PlayerName (Vector.Vector LocationLog))
 readCsv csv = do
     table <- decode NoHeader csv :: Either String (Vector.Vector TreasureLog)
@@ -64,5 +69,23 @@ readCsv csv = do
         playerLogMap = Map.fromListWith (Vector.++) . Vector.toList . Vector.map createPlayerLog
         in return . playerLogMap . removeDup $ table
 
+saveCsv :: Map.Map PlayerName (Vector.Vector LocationLog) -> ByteString
+saveCsv = encode . csvList
+
 createPlayerLog :: TreasureLog -> PlayerLog
-createPlayerLog (TreasureLog name time loc) = (name, Vector.singleton $ LocationLog (loc, Just time)) 
+createPlayerLog (TreasureLog name time loc) = (name, Vector.singleton $ LocationLog (loc, Just time))
+
+csvList :: Map.Map PlayerName (Vector.Vector LocationLog) -> [(String, Int, Location)]
+csvList = map toPureCsvPrimitives . concatMap createCsv . Map.toAscList
+
+createCsv :: (PlayerName, Vector.Vector LocationLog) -> [(PlayerName, UTCTime, Location)]
+createCsv (name, logs) = Vector.toList . Vector.mapMaybe toTuple $ logs
+    where
+        toTuple (LocationLog (loc, Just time)) = Just (name, time, loc)
+        toTuple _ = Nothing
+
+toPureCsvPrimitives :: (PlayerName, UTCTime, Location) -> (String, Int, Location)
+toPureCsvPrimitives (name, time, location) =
+    let timeStamp = read $ formatTime defaultTimeLocale "%s" time
+        player = Text.unpack . unPlayerName $ name
+        in (player, timeStamp, location)
