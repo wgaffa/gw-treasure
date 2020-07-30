@@ -47,19 +47,6 @@ instance FromRecord TreasureLog where
         | length v == 3 = TreasureLog <$> v .! 0 <*> v .! 1 <*> v .! 2
         | otherwise = fail "Wrong number of fields"
 
-instance ToField PlayerName where
-    toField = encodeUtf8 . unPlayerName
-
-instance ToField Location where
-    toField = BC.pack . show
-
-instance ToField UTCTime where
-    toField = BC.pack . formatTime defaultTimeLocale "%s"
-
-instance ToRecord TreasureLog where
-    toRecord (TreasureLog name' time' location') =
-        record [toField name', toField time', toField location']
-
 -- | Read a CSV string and remove any duplicate entries
 
 readCsv :: ByteString -> Either String (Map.Map PlayerName (Vector.Vector LocationLog))
@@ -75,7 +62,7 @@ saveCsv = encode . csvList
 createPlayerLog :: TreasureLog -> PlayerLog
 createPlayerLog (TreasureLog name time loc) = (name, Vector.singleton $ LocationLog (loc, Just time))
 
-csvList :: Map.Map PlayerName (Vector.Vector LocationLog) -> [(String, Int, Location)]
+csvList :: Map.Map PlayerName (Vector.Vector LocationLog) -> [(String, Int, String)]
 csvList = map toPureCsvPrimitives . concatMap createCsv . Map.toAscList
 
 createCsv :: (PlayerName, Vector.Vector LocationLog) -> [(PlayerName, UTCTime, Location)]
@@ -84,8 +71,9 @@ createCsv (name, logs) = Vector.toList . Vector.mapMaybe toTuple $ logs
         toTuple (LocationLog (loc, Just time)) = Just (name, time, loc)
         toTuple _ = Nothing
 
-toPureCsvPrimitives :: (PlayerName, UTCTime, Location) -> (String, Int, Location)
+toPureCsvPrimitives :: (PlayerName, UTCTime, Location) -> (String, Int, String)
 toPureCsvPrimitives (name, time, location) =
     let timeStamp = read $ formatTime defaultTimeLocale "%s" time
         player = Text.unpack . unPlayerName $ name
-        in (player, timeStamp, location)
+        locationName = show location
+        in (player, timeStamp, locationName)
