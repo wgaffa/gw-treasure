@@ -37,7 +37,7 @@ viewReset contents = do
 
     setSGR [Reset]
 
-playerReset :: PlayerLog -> IO ()
+playerReset :: Player -> IO ()
 playerReset (name, logs) = do
     putStrLn . T.unpack . unPlayerName $ name
     timeZone <- getCurrentTimeZone

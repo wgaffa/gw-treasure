@@ -8,8 +8,8 @@ import qualified Data.Text as T
 
 import Treasure
 
-resetTimes :: Map.Map PlayerName (Vector.Vector LocationLog) -> Map.Map PlayerName (Vector.Vector LocationLog)
+resetTimes :: PlayerData -> PlayerData
 resetTimes = Map.map reset . Map.map addMissingLocations
     where
         reset = Vector.map resetLocation
-        resetLocation (LocationLog (loc, time)) = LocationLog (loc, resetsAt <$> time)
+        resetLocation (Treasure loc time) = Treasure loc $ resetsAt <$> time

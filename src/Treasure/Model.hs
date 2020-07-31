@@ -3,8 +3,9 @@
 module Treasure.Model (
       Location(..)
     , PlayerName()
-    , LocationLog(..)
-    , PlayerLog
+    , Treasure(..)
+    , PlayerData
+    , Player
     , unPlayerName
     , createPlayerName
     , parseLocation
@@ -16,6 +17,7 @@ import Data.Maybe (fromMaybe)
 import Data.Monoid (First(..), getFirst)
 
 import Data.Vector (Vector, singleton)
+import Data.Map (Map)
 
 data Location = IssnurIsles | MehtaniKeys | ArkjokWard | BahdokCaverns |
     JahaiBluffs | MirrorOfLyss | ForumHighlands | HiddenCityOfAhdashim |
@@ -25,17 +27,16 @@ data Location = IssnurIsles | MehtaniKeys | ArkjokWard | BahdokCaverns |
 newtype PlayerName = PlayerName { unPlayerName :: T.Text }
     deriving (Ord, Eq, Read, Show)
 
--- | Denotes when a treasure was last accessed,
--- Nothing denotes that there is no record of it being opened.
--- A location log is equal to another if their location is equal.
-newtype LocationLog = LocationLog { unLocationLog :: (Location, Maybe UTCTime) }
-    deriving (Show)
+data Treasure = Treasure {
+    treasureLocation :: Location
+    , treasureOpened :: Maybe UTCTime
+} deriving (Show)
 
--- | Structure for representing a players log
-type PlayerLog = (PlayerName, Vector LocationLog)
+type Player = (PlayerName, Vector Treasure)
+type PlayerData = Map PlayerName (Vector Treasure)
 
-instance Eq LocationLog where
-    (==) a b = fst (unLocationLog a) == fst (unLocationLog b)
+instance Eq Treasure where
+    (==) a b = treasureLocation a == treasureLocation b
 
 instance Show Location where
     show IssnurIsles = "Issnur Isles"

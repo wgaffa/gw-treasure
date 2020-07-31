@@ -2,9 +2,10 @@
 
 module Treasure (
     Location (..)
-    , LocationLog(..)
+    , Treasure(..)
     , PlayerName()
-    , PlayerLog
+    , PlayerData
+    , Player
     , createPlayerName
     , unPlayerName
     , parseLocation
@@ -23,10 +24,10 @@ resetsAt time =
     let resetTime = addDays 30 $ utctDay time
     in UTCTime resetTime $ utctDayTime time
 
-addMissingLocations :: Vector.Vector LocationLog -> Vector.Vector LocationLog
+addMissingLocations :: Vector.Vector Treasure -> Vector.Vector Treasure
 addMissingLocations locations = locations Vector.++ transform locations
     where
         transform = Vector.fromList . map missingLoc . missingLocations
         missingLocations logs = [minBound .. maxBound] \\ visited logs
-        visited = Vector.toList . Vector.map (fst . unLocationLog)
-        missingLoc loc = LocationLog (loc, Nothing)
+        visited = Vector.toList . Vector.map treasureLocation
+        missingLoc loc = Treasure loc Nothing

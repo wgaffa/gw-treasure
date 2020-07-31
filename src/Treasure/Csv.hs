@@ -22,16 +22,7 @@ import Data.Maybe (fromJust)
 import Treasure.Model
 
 -- | Data structure of a flat log file such as CSV files
-
-data TreasureLog = TreasureLog {
-    tlPlayerName   :: PlayerName,
-    tlLastAccessed :: UTCTime,
-    tlLocation     :: Location
-} deriving (Show)
-
-instance Eq TreasureLog where
-    (==) a b = tlPlayerName a == tlPlayerName b
-        && tlLocation a == tlLocation b
+type TreasureLog = (PlayerName, UTCTime, Location)
 
 instance FromField Location where
     parseField = maybe (fail "Invalid location") pure . parseLocation . decodeUtf8
@@ -42,33 +33,29 @@ instance FromField PlayerName where
 instance FromField UTCTime where
     parseField = maybe (fail "Date time format invalid") pure . parseTimeM True defaultTimeLocale "%s" . BC.unpack
 
-instance FromRecord TreasureLog where
-    parseRecord v
-        | length v == 3 = TreasureLog <$> v .! 0 <*> v .! 1 <*> v .! 2
-        | otherwise = fail "Wrong number of fields"
-
 -- | Read a CSV string and remove any duplicate entries
-
-readCsv :: ByteString -> Either String (Map.Map PlayerName (Vector.Vector LocationLog))
+readCsv :: ByteString -> Either String PlayerData
 readCsv csv = do
     table <- decode NoHeader csv :: Either String (Vector.Vector TreasureLog)
-    let removeDup = Vector.fromList . nub . Vector.toList
+    let removeDup = Vector.fromList . nubBy compare . Vector.toList
+        compare (an, _, al) (bn, _, bl) = an == bn && al == bl
         playerLogMap = Map.fromListWith (Vector.++) . Vector.toList . Vector.map createPlayerLog
         in return . playerLogMap . removeDup $ table
 
-saveCsv :: Map.Map PlayerName (Vector.Vector LocationLog) -> ByteString
+saveCsv :: PlayerData -> ByteString
 saveCsv = encode . csvList
 
-createPlayerLog :: TreasureLog -> PlayerLog
-createPlayerLog (TreasureLog name time loc) = (name, Vector.singleton $ LocationLog (loc, Just time))
+createPlayerLog :: TreasureLog -> (PlayerName, Vector.Vector Treasure)
+createPlayerLog (name, time, loc) =
+    (name, Vector.singleton $ Treasure loc (Just time))
 
-csvList :: Map.Map PlayerName (Vector.Vector LocationLog) -> [(String, Int, String)]
+csvList :: PlayerData -> [(String, Int, String)]
 csvList = map toPureCsvPrimitives . concatMap createCsv . Map.toAscList
 
-createCsv :: (PlayerName, Vector.Vector LocationLog) -> [(PlayerName, UTCTime, Location)]
+createCsv :: (PlayerName, Vector.Vector Treasure) -> [(PlayerName, UTCTime, Location)]
 createCsv (name, logs) = Vector.toList . Vector.mapMaybe toTuple $ logs
     where
-        toTuple (LocationLog (loc, Just time)) = Just (name, time, loc)
+        toTuple (Treasure loc (Just time)) = Just (name, time, loc)
         toTuple _ = Nothing
 
 toPureCsvPrimitives :: (PlayerName, UTCTime, Location) -> (String, Int, String)
