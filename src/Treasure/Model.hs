@@ -35,9 +35,6 @@ data Treasure = Treasure {
 type Player = (PlayerName, Vector Treasure)
 type PlayerData = Map PlayerName (Vector Treasure)
 
-instance Eq Treasure where
-    (==) a b = treasureLocation a == treasureLocation b
-
 instance Show Location where
     show IssnurIsles = "Issnur Isles"
     show MehtaniKeys = "Mehtani Keys"
