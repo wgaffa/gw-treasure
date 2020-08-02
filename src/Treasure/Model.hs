@@ -30,7 +30,7 @@ newtype PlayerName = PlayerName { unPlayerName :: T.Text }
 data Treasure = Treasure {
     treasureLocation :: Location
     , treasureOpened :: Maybe UTCTime
-} deriving (Show)
+} deriving (Eq, Show)
 
 type Player = (PlayerName, Vector Treasure)
 type PlayerData = Map PlayerName (Vector Treasure)

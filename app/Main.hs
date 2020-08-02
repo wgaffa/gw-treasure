@@ -12,6 +12,7 @@ import Command
 dispatch :: [(String, [String] -> IO ())]
 dispatch = [
     ("view", view)
+    , ("update", update)
     ]
 
 main :: IO ()
