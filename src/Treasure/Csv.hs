@@ -43,7 +43,10 @@ readCsv csv = do
         in return . playerLogMap . removeDup $ table
 
 saveCsv :: PlayerData -> ByteString
-saveCsv = encode . csvList
+saveCsv = encodeWith encodeOptions . csvList
+
+encodeOptions :: EncodeOptions
+encodeOptions = defaultEncodeOptions { encUseCrLf = False }
 
 createPlayerLog :: TreasureLog -> (PlayerName, Vector.Vector Treasure)
 createPlayerLog (name, time, loc) =

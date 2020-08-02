@@ -46,6 +46,7 @@ executables:
     - containers
     - ansi-terminal
     - terminal-size
+    - directory
 
 tests:
   gw-treasure-test:

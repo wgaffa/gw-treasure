@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 407f5a0506cb10f684388890b4e37d871be0ec7ae0aa1be99bfc6b1cdb9fccb8
+-- hash: 9391b92748609bc8462d9a043cd61bb86a64bf19008fd14af31d9f5b4bd4cd09
 
 name:           gw-treasure
 version:        0.1.0.0
@@ -64,6 +64,7 @@ executable gw-treasure-exe
     , bytestring
     , cassava
     , containers
+    , directory
     , formatting
     , gw-treasure
     , terminal-size
